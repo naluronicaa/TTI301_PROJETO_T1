@@ -7,6 +7,7 @@ dotenv.config();
 // Configurações de ambiente
 const PROTOCOL = process.env.PROTOCOL;
 const BASE_URL = process.env.BASE_URL;
+const BASE_URL2 = process.env.BASE_URL2;
 const API_KEY = process.env.API_KEY;
 
 // Função para obter coordenadas a partir do nome da cidade
@@ -20,27 +21,31 @@ async function getCoordinates(cityName) {
       throw new Error('Cidade não encontrada.');
     }
 
-    // Exibe todas as opções encontradas
-    console.log(`\nResultados para "${cityName}":`);
-    response.data.forEach((location, index) => {
-      console.log(`\nOpção ${index + 1}:`);
-      console.log(`Nome: ${location.name}`);
-      console.log(`País: ${location.country}`);
-      console.log(`Estado: ${location.state || 'Não especificado'}`);
-      console.log(`Latitude: ${location.lat}, Longitude: ${location.lon}`);
-    });
-
     // Seleciona o primeiro resultado por padrão
     const { lat, lon } = response.data[0];
     console.log(`\nCoordenadas selecionadas de ${cityName}: Latitude ${lat}, Longitude ${lon}`);
-    return { lat, lon };
+    getConditions(lat,lon,cityName);
   } catch (error) {
     console.error('Erro ao obter coordenadas:', error.message);
   }
 }
 
-async function getConditions(lat, lon) {
-  
+async function getConditions(lat, lon, cityName) {
+  try {
+    const url = `${PROTOCOL}://${BASE_URL2}?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+    const response = await axios.get(url);
+
+    const feels_like = response.data.main.feels_like;
+    const description = response.data.weather[0].description;
+
+    // Converte de Kelvin para Celsius e formata para duas casas decimais
+    const feels_celsius = (feels_like - 273.15).toFixed(2);
+
+    // Seleciona o primeiro resultado por padrão
+    console.log(`\nDe acordo com as coordenadas da cidade de ${cityName}, a sensação térmica é ${feels_celsius} oC e sua descrição é ${description}\n`);
+  }catch (error) {
+    console.error('Erro ao obter condições:', error.message);
+  }
 }
 
 // Captura o nome da cidade do usuário
