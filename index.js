@@ -32,7 +32,7 @@ async function getCoordinates(cityName) {
 
 async function getConditions(lat, lon, cityName) {
   try {
-    const url = `${PROTOCOL}://${BASE_URL2}?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+    const url = `${PROTOCOL}://${BASE_URL2}?lat=${lat}&lon=${lon}&appid=${API_KEY}&lang=pt_BR`;
     const response = await axios.get(url);
 
     const feels_like = response.data.main.feels_like;
